@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useLocation } from "wouter";
-import { User, MOCK_USERS } from "@/lib/mockData";
+import { User, MOCK_USERS, Patient, MOCK_PATIENTS } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
 
 type AuthContextType = {
@@ -8,6 +8,10 @@ type AuthContextType = {
   login: (hospitalCode: string, userId: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
+  patients: Patient[];
+  addPatient: (patient: Patient) => void;
+  removePatient: (id: string) => void;
+  updatePatient: (patient: Patient) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,12 +19,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [patients, setPatients] = useState<Patient[]>(MOCK_PATIENTS);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const login = async (hospitalCode: string, userId: string) => {
     setIsLoading(true);
-    // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     if (hospitalCode !== "HOSP-001") {
@@ -39,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(foundUser);
       toast({
         title: "Welcome back",
-        description: `Logged in as ${foundUser.name} (${foundUser.role})`,
+        description: `Logged in as ${foundUser.name} (${foundUser.role === 'patient' ? 'Parent' : foundUser.role})`,
       });
       setLocation("/dashboard");
     } else {
@@ -61,8 +65,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const addPatient = (patient: Patient) => {
+    setPatients(prev => [...prev, patient]);
+    toast({ title: "Patient Added", description: `${patient.name} has been registered.` });
+  };
+
+  const removePatient = (id: string) => {
+    setPatients(prev => prev.filter(p => p.id !== id));
+    toast({ title: "Patient Discharged", description: "Patient record removed from system." });
+  };
+
+  const updatePatient = (patient: Patient) => {
+    setPatients(prev => prev.map(p => p.id === patient.id ? patient : p));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, patients, addPatient, removePatient, updatePatient }}>
       {children}
     </AuthContext.Provider>
   );

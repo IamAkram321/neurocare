@@ -3,55 +3,123 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { VitalsCard } from "@/components/dashboard/VitalsCard";
 import { ECGChart } from "@/components/dashboard/ECGChart";
-import { MOCK_PATIENTS } from "@/lib/mockData";
-import { AlertCircle, Users, Activity, Bed, Clock } from "lucide-react";
+import { AlertCircle, Users, Activity, Bed, Clock, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Overview() {
-  const { user } = useAuth();
+  const { user, patients, addPatient, removePatient } = useAuth();
+  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
+  const [newPatient, setNewPatient] = useState({
+    name: "",
+    age: "",
+    gender: "Male",
+    diagnosis: "",
+    wardId: "ICU-A",
+    bedNumber: "",
+    status: "stable"
+  });
   
-  // Filter logic based on role
   const relevantPatients = user?.role === "doctor" 
-    ? MOCK_PATIENTS.filter(p => p.doctorId === user.id)
+    ? patients.filter(p => p.doctorId === user.id)
     : user?.role === "nurse"
-    ? MOCK_PATIENTS.filter(p => p.wardId === user.assignedWard)
-    : MOCK_PATIENTS;
+    ? patients.filter(p => p.wardId === user.assignedWard)
+    : user?.role === "patient"
+    ? patients.filter(p => p.id === user.id) // Mock: parent sees their specific patient
+    : patients;
 
   const criticalPatients = relevantPatients.filter(p => p.status === "critical");
-  const stablePatients = relevantPatients.filter(p => p.status === "stable");
 
   if (!user) return null;
+
+  const handleAddPatient = () => {
+    const id = `PAT-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    addPatient({
+      ...newPatient,
+      id,
+      age: parseInt(newPatient.age) || 0,
+      gender: newPatient.gender as "Male" | "Female" | "Other",
+      admissionDate: new Date().toISOString().split('T')[0],
+      doctorId: "DOC-001",
+      status: newPatient.status as any,
+      vitals: {
+        heartRate: 75,
+        spO2: 98,
+        bloodPressure: "120/80",
+        temperature: 37.0,
+        respiratoryRate: 16
+      },
+      alerts: []
+    });
+    setIsAddPatientOpen(false);
+    setNewPatient({ name: "", age: "", gender: "Male", diagnosis: "", wardId: "ICU-A", bedNumber: "", status: "stable" });
+  };
 
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            <h2 className="text-3xl font-bold tracking-tight">
+              {user.role === 'patient' ? 'Parent Dashboard' : 'Dashboard'}
+            </h2>
             <p className="text-muted-foreground">
-              Welcome back, {user.name}. Here's what's happening in your ward.
+              Welcome back, {user.name}.
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm">
-               <Clock className="mr-2 h-4 w-4" /> Shift Log
-            </Button>
-            <Button size="sm">Generate Report</Button>
+            {user.role === 'admin' && (
+              <Dialog open={isAddPatientOpen} onOpenChange={setIsAddPatientOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Add Patient</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Register New Patient</DialogTitle></DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">Name</Label>
+                      <Input id="name" value={newPatient.name} onChange={e => setNewPatient({...newPatient, name: e.target.value})} className="col-span-3" />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="age" className="text-right">Age</Label>
+                      <Input id="age" type="number" value={newPatient.age} onChange={e => setNewPatient({...newPatient, age: e.target.value})} className="col-span-3" />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label className="text-right">Gender</Label>
+                      <Select value={newPatient.gender} onValueChange={v => setNewPatient({...newPatient, gender: v})}>
+                        <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="diag" className="text-right">Diagnosis</Label>
+                      <Input id="diag" value={newPatient.diagnosis} onChange={e => setNewPatient({...newPatient, diagnosis: e.target.value})} className="col-span-3" />
+                    </div>
+                  </div>
+                  <DialogFooter><Button onClick={handleAddPatient}>Confirm Admission</Button></DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+            <Button variant="outline" size="sm"><Clock className="mr-2 h-4 w-4" /> Shift Log</Button>
           </div>
         </div>
 
-        {/* Stats Row */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
+              <CardTitle className="text-sm font-medium">Monitoring Patients</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{relevantPatients.length}</div>
-              <p className="text-xs text-muted-foreground">+2 from last shift</p>
             </CardContent>
           </Card>
           <Card>
@@ -61,33 +129,11 @@ export default function Overview() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-destructive">{criticalPatients.length}</div>
-              <p className="text-xs text-muted-foreground">Requires immediate attention</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bed Occupancy</CardTitle>
-              <Bed className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">85%</div>
-              <p className="text-xs text-muted-foreground">3 beds available</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">7</div>
-              <p className="text-xs text-muted-foreground">Across all wards</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Critical Patients Grid (Nurse/Doctor View) */}
-        {(user.role === "nurse" || user.role === "doctor" || user.role === "admin") && (
+        {(user.role !== 'patient') && criticalPatients.length > 0 && (
           <div className="space-y-4">
              <h3 className="text-xl font-semibold tracking-tight">Critical Monitoring</h3>
              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -97,44 +143,22 @@ export default function Overview() {
                      <div>
                        <CardTitle className="text-base font-bold flex items-center">
                          {patient.name}
-                         <span className="ml-2 inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-                           CRITICAL
-                         </span>
+                         <span className="ml-2 inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">CRITICAL</span>
                        </CardTitle>
                        <CardDescription>{patient.bedNumber} • {patient.diagnosis}</CardDescription>
                      </div>
                      <Link href={`/dashboard/patient/${patient.id}`}>
                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                         <ArrowRight className="h-4 w-4" />
+                         <Activity className="h-4 w-4" />
                        </Button>
                      </Link>
                    </CardHeader>
                    <CardContent className="p-4 space-y-4">
-                      {/* Vitals Grid */}
                       <div className="grid grid-cols-2 gap-3">
-                        <VitalsCard 
-                          title="Heart Rate" 
-                          value={patient.vitals.heartRate} 
-                          unit="bpm" 
-                          status="critical" 
-                          trend="up"
-                          className="border-none shadow-none bg-background/50"
-                        />
-                         <VitalsCard 
-                          title="SpO2" 
-                          value={patient.vitals.spO2} 
-                          unit="%" 
-                          status="warning" 
-                          trend="down"
-                          className="border-none shadow-none bg-background/50"
-                        />
+                        <VitalsCard title="Heart Rate" value={patient.vitals.heartRate} unit="bpm" status="critical" trend="up" className="border-none shadow-none bg-background/50" />
+                        <VitalsCard title="SpO2" value={patient.vitals.spO2} unit="%" status="warning" trend="down" className="border-none shadow-none bg-background/50" />
                       </div>
-                      
-                      {/* Live ECG */}
-                      <div className="rounded-md border border-border bg-black/5 p-2">
-                         <div className="mb-1 text-xs font-mono text-muted-foreground">ECG Lead II (Live)</div>
-                         <ECGChart patientId={patient.id} height={60} color="rgb(239, 68, 68)" />
-                      </div>
+                      <ECGChart patientId={patient.id} height={60} color="rgb(239, 68, 68)" />
                    </CardContent>
                  </Card>
                ))}
@@ -142,49 +166,40 @@ export default function Overview() {
           </div>
         )}
         
-        {/* Patient Table (All Roles) */}
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold tracking-tight">Patient List</h3>
+          <h3 className="text-xl font-semibold tracking-tight">Patient Registry</h3>
           <Card>
              <div className="relative w-full overflow-auto">
                 <table className="w-full caption-bottom text-sm text-left">
                   <thead className="[&_tr]:border-b">
-                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">ID</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Name</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Ward/Bed</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Vitals Summary</th>
-                      <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Action</th>
+                    <tr className="border-b transition-colors hover:bg-muted/50 font-medium text-muted-foreground">
+                      <th className="h-12 px-4">ID</th>
+                      <th className="h-12 px-4">Name</th>
+                      <th className="h-12 px-4">Ward/Bed</th>
+                      <th className="h-12 px-4">Status</th>
+                      <th className="h-12 px-4 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="[&_tr:last-child]:border-0">
+                  <tbody>
                     {relevantPatients.map((patient) => (
                       <tr key={patient.id} className="border-b transition-colors hover:bg-muted/50">
-                        <td className="p-4 align-middle font-mono text-xs">{patient.id}</td>
-                        <td className="p-4 align-middle font-medium">{patient.name}</td>
-                        <td className="p-4 align-middle">{patient.wardId} - {patient.bedNumber}</td>
-                        <td className="p-4 align-middle">
-                           <span className={cn(
-                             "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset",
-                             patient.status === "critical" ? "bg-red-50 text-red-700 ring-red-600/20" :
-                             patient.status === "stable" ? "bg-green-50 text-green-700 ring-green-600/20" :
-                             "bg-yellow-50 text-yellow-800 ring-yellow-600/20"
-                           )}>
+                        <td className="p-4 font-mono text-xs">{patient.id}</td>
+                        <td className="p-4 font-medium">{patient.name}</td>
+                        <td className="p-4">{patient.wardId} - {patient.bedNumber}</td>
+                        <td className="p-4">
+                           <span className={cn("inline-flex items-center rounded-full px-2 py-1 text-xs font-medium", patient.status === "critical" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700")}>
                              {patient.status.toUpperCase()}
                            </span>
                         </td>
-                        <td className="p-4 align-middle">
-                          <div className="flex space-x-3 text-xs font-mono">
-                            <span className="text-red-600">HR: {patient.vitals.heartRate}</span>
-                            <span className="text-blue-600">SpO2: {patient.vitals.spO2}%</span>
-                            <span className="text-orange-600">BP: {patient.vitals.bloodPressure}</span>
-                          </div>
-                        </td>
-                        <td className="p-4 align-middle text-right">
+                        <td className="p-4 text-right space-x-2">
                           <Link href={`/dashboard/patient/${patient.id}`}>
-                            <Button variant="ghost" size="sm">View Details</Button>
+                            <Button variant="ghost" size="sm">Details</Button>
                           </Link>
+                          {user.role === 'admin' && (
+                            <Button variant="ghost" size="sm" onClick={() => removePatient(patient.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -198,27 +213,6 @@ export default function Overview() {
   );
 }
 
-// Helper function for cn
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
-}
-
-function ArrowRight(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
-  )
 }

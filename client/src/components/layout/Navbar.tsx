@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 
 export function Navbar() {
@@ -105,9 +105,10 @@ export function Navbar() {
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="rounded-full"
             >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-primary" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-primary" />
               <span className="sr-only">Toggle theme</span>
             </Button>
             
@@ -140,7 +141,7 @@ export function Navbar() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
                     <Settings className="mr-2 h-4 w-4" />
-                    Appearance: {theme === 'dark' ? 'Dark' : 'Light'}
+                    Settings & Theme
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">

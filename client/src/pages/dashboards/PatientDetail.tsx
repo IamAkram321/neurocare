@@ -213,7 +213,7 @@ export default function PatientDetail() {
                                <p className="text-sm text-muted-foreground mt-1">{n.text}</p>
                              </div>
                              {user?.role === 'doctor' && (
-                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                               <div className="flex items-center gap-1">
                                  <Dialog>
                                    <DialogTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditingNote(n)}><Edit2 className="h-3.5 w-3.5" /></Button></DialogTrigger>
                                    <DialogContent>

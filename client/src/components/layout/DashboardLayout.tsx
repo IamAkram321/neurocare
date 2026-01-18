@@ -95,8 +95,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-muted/20 p-6">
-          <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <main className="flex-1 overflow-y-auto bg-muted/20 p-6 relative">
+          <div className="mx-auto max-w-7xl">
             {children}
           </div>
         </main>

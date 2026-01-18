@@ -61,7 +61,7 @@
   --color-card: 222 47% 13%;
   --color-card-foreground: 210 40% 98%;
 
-  --color-popover: 222 47% 11%;
+  --color-popover: 222 47% 13%;
   --color-popover-foreground: 210 40% 98%;
 
   --color-primary: 183 70% 50%;
@@ -79,8 +79,8 @@
   --color-destructive: 0 62.8% 30.6%;
   --color-destructive-foreground: 210 40% 98%;
 
-  --color-border: 217.2 32.6% 17.5%;
-  --color-input: 217.2 32.6% 17.5%;
+  --color-border: 217.2 32.6% 25%;
+  --color-input: 217.2 32.6% 25%;
   --color-ring: 183 70% 50%;
 }
 
@@ -106,10 +106,6 @@
 
 .animate-pulse-slow {
   animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.glass-panel {
-  @apply bg-white/80 dark:bg-black/50 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg;
 }
 
 .dashboard-card {

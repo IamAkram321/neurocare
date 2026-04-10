@@ -58,6 +58,56 @@ export default function PatientDetail() {
 
   const handleExport = () => {
     toast({ title: "Generating Report", description: "Medical report is being generated for download." });
+    
+    // Create a mock text file content
+    const reportContent = `
+NEUROCARE ICU - PATIENT MEDICAL REPORT
+======================================
+Generated: ${new Date().toLocaleString()}
+
+PATIENT INFORMATION
+-------------------
+Name: ${patient.name}
+ID: ${patient.id}
+Age: ${patient.age}
+Gender: ${patient.gender}
+Status: ${patient.status.toUpperCase()}
+Ward: ${patient.wardId}
+Bed: ${patient.bedNumber}
+Primary Diagnosis: ${patient.diagnosis}
+Admission Date: ${patient.admissionDate}
+Attending Doctor ID: ${patient.doctorId}
+
+CURRENT VITALS
+--------------
+Heart Rate: ${patient.vitals.heartRate} bpm
+SpO2: ${patient.vitals.spO2}%
+Blood Pressure: ${patient.vitals.bloodPressure} mmHg
+Temperature: ${patient.vitals.temperature}°C
+Respiratory Rate: ${patient.vitals.respiratoryRate} breaths/min
+
+ACTIVE MEDICATIONS
+------------------
+${meds.length > 0 ? meds.map(m => `- ${m.name}: ${m.dose} [${m.status}]`).join('\n') : 'No medications recorded'}
+
+CLINICAL NOTES
+--------------
+${notes.length > 0 ? notes.map(n => `[${n.time}] ${n.author}:\n${n.text}\n`).join('\n') : 'No clinical notes recorded'}
+
+======================================
+End of Report
+    `.trim();
+
+    // Create a blob and trigger download
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `patient_report_${patient.id}_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleAddMed = () => {
@@ -120,10 +170,6 @@ export default function PatientDetail() {
             </div>
 
             <div className="md:col-span-3 space-y-6">
-               <Card><CardHeader><CardTitle>Live Telemetry</CardTitle></CardHeader>
-                 {/* <CardContent><ECGChart patientId={patient.id} height={180} /></CardContent> */}
-               </Card>
-
                <Tabs defaultValue="meds">
                  <TabsList>
                    <TabsTrigger value="meds">Medications</TabsTrigger>

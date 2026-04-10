@@ -38,8 +38,8 @@ export default function PatientDetail() {
   ]);
   
   const [notes, setNotes] = useState<Note[]>([
-    { id: 1, author: "Dr. James Smith", time: "2 hours ago", text: "Patient showing signs of improvement." },
-    { id: 2, author: "Nurse Sarah", time: "30 mins ago", text: "Administered scheduled fluids." }
+    { id: 1, author: "Dr. Rajesh Kumar", time: "2 hours ago", text: "Patient showing signs of improvement." },
+    { id: 2, author: "Nurse Kavita", time: "30 mins ago", text: "Administered scheduled fluids." }
   ]);
 
   const [newMed, setNewMed] = useState({ name: "", dose: "" });

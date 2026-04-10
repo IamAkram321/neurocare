@@ -84,7 +84,7 @@ export default function LoginPage() {
               <Button variant="outline" size="sm" onClick={() => handleDemoFill("admin")} className="text-xs">Admin</Button>
               <Button variant="outline" size="sm" onClick={() => handleDemoFill("doctor")} className="text-xs">Doctor</Button>
               <Button variant="outline" size="sm" onClick={() => handleDemoFill("nurse")} className="text-xs">Nurse</Button>
-              <Button variant="outline" size="sm" onClick={() => handleDemoFill("patient")} className="text-xs">Patient</Button>
+              <Button variant="outline" size="sm" onClick={() => handleDemoFill("patient")} className="text-xs">Parent</Button>
             </div>
           </div>
         </CardContent>

@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MOCK_USERS } from "@/lib/mockData";
 
 export default function Overview() {
   const { user, patients, addPatient, removePatient } = useAuth();
@@ -20,6 +21,7 @@ export default function Overview() {
     age: "",
     gender: "Male",
     diagnosis: "",
+    doctorId: "DOC-001",
     wardId: "ICU-A",
     bedNumber: "",
     status: "stable",
@@ -52,7 +54,6 @@ export default function Overview() {
       age: parseInt(newPatient.age) || 0,
       gender: newPatient.gender as "Male" | "Female" | "Other",
       admissionDate: new Date().toISOString().split('T')[0],
-      doctorId: "DOC-001",
       status: newPatient.status as any,
       vitals: {
         heartRate: parseInt(newPatient.vitals.heartRate) || 0,
@@ -65,7 +66,7 @@ export default function Overview() {
     });
     setIsAddPatientOpen(false);
     setNewPatient({ 
-      name: "", age: "", gender: "Male", diagnosis: "", wardId: "ICU-A", bedNumber: "", status: "stable",
+      name: "", age: "", gender: "Male", diagnosis: "", doctorId: "DOC-001", wardId: "ICU-A", bedNumber: "", status: "stable",
       vitals: { heartRate: "", spO2: "", bloodPressure: "", temperature: "", respiratoryRate: "" }
     });
   };
@@ -136,6 +137,17 @@ export default function Overview() {
                     <div className="space-y-2">
                       <Label htmlFor="diag">Primary Diagnosis</Label>
                       <Input id="diag" placeholder="e.g. Acute Cardiac Failure" value={newPatient.diagnosis} onChange={e => setNewPatient({...newPatient, diagnosis: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Attending Doctor</Label>
+                      <Select value={newPatient.doctorId} onValueChange={v => setNewPatient({...newPatient, doctorId: v})}>
+                        <SelectTrigger><SelectValue placeholder="Select Doctor" /></SelectTrigger>
+                        <SelectContent>
+                          {MOCK_USERS.filter(u => u.role === 'doctor').map(doctor => (
+                            <SelectItem key={doctor.id} value={doctor.id}>{doctor.name} - {doctor.specialty}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">

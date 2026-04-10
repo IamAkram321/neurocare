@@ -42,48 +42,48 @@ export interface Alert {
 export const MOCK_USERS: User[] = [
   {
     id: "ADMIN-001",
-    name: "Dr. Sarah Admin",
+    name: "Dr. Ananya Sharma",
     role: "admin",
     hospitalCode: "HOSP-001",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya",
   },
   {
     id: "DOC-001",
-    name: "Dr. James Wilson",
+    name: "Dr. Rajesh Kumar",
     role: "doctor",
     hospitalCode: "HOSP-001",
     specialty: "Cardiology",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rajesh",
   },
   {
     id: "DOC-002",
-    name: "Dr. Emily Chen",
+    name: "Dr. Priya Patel",
     role: "doctor",
     hospitalCode: "HOSP-001",
     specialty: "Neurology",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emily",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Priya",
   },
   {
     id: "NURSE-001",
-    name: "Nurse John Doe",
+    name: "Nurse Kavita Singh",
     role: "nurse",
     hospitalCode: "HOSP-001",
     assignedWard: "ICU-A",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Kavita",
   },
   {
     id: "PAT-001",
-    name: "Michael Brown",
+    name: "Rahul Verma",
     role: "patient",
     hospitalCode: "HOSP-001",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Michael",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul",
   },
 ];
 
 export const MOCK_PATIENTS: Patient[] = [
   {
     id: "PAT-001",
-    name: "Michael Brown",
+    name: "Rahul Verma",
     age: 45,
     gender: "Male",
     diagnosis: "Acute Myocardial Infarction",
@@ -111,7 +111,7 @@ export const MOCK_PATIENTS: Patient[] = [
   },
   {
     id: "PAT-002",
-    name: "Alice Smith",
+    name: "Sunita Devi",
     age: 62,
     gender: "Female",
     diagnosis: "Post-op Recovery",
@@ -131,7 +131,7 @@ export const MOCK_PATIENTS: Patient[] = [
   },
   {
     id: "PAT-003",
-    name: "Robert Johnson",
+    name: "Arjun Reddy",
     age: 55,
     gender: "Male",
     diagnosis: "Respiratory Failure",
@@ -159,7 +159,7 @@ export const MOCK_PATIENTS: Patient[] = [
   },
   {
     id: "PAT-004",
-    name: "Linda Davis",
+    name: "Neha Gupta",
     age: 34,
     gender: "Female",
     diagnosis: "Severe Sepsis",

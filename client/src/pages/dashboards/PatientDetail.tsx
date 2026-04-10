@@ -2,7 +2,7 @@ import { useRoute } from "wouter";
 import { useAuth } from "@/context/AuthContext";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { VitalsCard } from "@/components/dashboard/VitalsCard";
-import { ECGChart } from "@/components/dashboard/ECGChart";
+// import { ECGChart } from "@/components/dashboard/ECGChart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -121,7 +121,7 @@ export default function PatientDetail() {
 
             <div className="md:col-span-3 space-y-6">
                <Card><CardHeader><CardTitle>Live Telemetry</CardTitle></CardHeader>
-                 <CardContent><ECGChart patientId={patient.id} height={180} /></CardContent>
+                 {/* <CardContent><ECGChart patientId={patient.id} height={180} /></CardContent> */}
                </Card>
 
                <Tabs defaultValue="meds">

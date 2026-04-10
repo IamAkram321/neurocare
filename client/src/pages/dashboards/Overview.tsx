@@ -2,7 +2,7 @@ import { useAuth } from "@/context/AuthContext";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { VitalsCard } from "@/components/dashboard/VitalsCard";
-import { ECGChart } from "@/components/dashboard/ECGChart";
+// import { ECGChart } from "@/components/dashboard/ECGChart";
 import { AlertCircle, Users, Activity, Bed, Clock, Plus, Trash2, UserPlus, HeartPulse, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -22,7 +22,14 @@ export default function Overview() {
     diagnosis: "",
     wardId: "ICU-A",
     bedNumber: "",
-    status: "stable"
+    status: "stable",
+    vitals: {
+      heartRate: "",
+      spO2: "",
+      bloodPressure: "",
+      temperature: "",
+      respiratoryRate: ""
+    }
   });
   
   const relevantPatients = user?.role === "doctor" 
@@ -48,16 +55,19 @@ export default function Overview() {
       doctorId: "DOC-001",
       status: newPatient.status as any,
       vitals: {
-        heartRate: 75,
-        spO2: 98,
-        bloodPressure: "120/80",
-        temperature: 37.0,
-        respiratoryRate: 16
+        heartRate: parseInt(newPatient.vitals.heartRate) || 0,
+        spO2: parseInt(newPatient.vitals.spO2) || 0,
+        bloodPressure: newPatient.vitals.bloodPressure || "120/80",
+        temperature: parseFloat(newPatient.vitals.temperature) || 37.0,
+        respiratoryRate: parseInt(newPatient.vitals.respiratoryRate) || 0
       },
       alerts: []
     });
     setIsAddPatientOpen(false);
-    setNewPatient({ name: "", age: "", gender: "Male", diagnosis: "", wardId: "ICU-A", bedNumber: "", status: "stable" });
+    setNewPatient({ 
+      name: "", age: "", gender: "Male", diagnosis: "", wardId: "ICU-A", bedNumber: "", status: "stable",
+      vitals: { heartRate: "", spO2: "", bloodPressure: "", temperature: "", respiratoryRate: "" }
+    });
   };
 
   return (
@@ -141,6 +151,33 @@ export default function Overview() {
                       <div className="space-y-2">
                         <Label htmlFor="bed">Bed Number</Label>
                         <Input id="bed" placeholder="A-01" value={newPatient.bedNumber} onChange={e => setNewPatient({...newPatient, bedNumber: e.target.value})} />
+                      </div>
+                    </div>
+                    <div className="space-y-4 pt-4 border-t">
+                      <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Initial Vitals</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="heartRate">Heart Rate (bpm)</Label>
+                          <Input id="heartRate" type="number" placeholder="75" value={newPatient.vitals.heartRate} onChange={e => setNewPatient({...newPatient, vitals: {...newPatient.vitals, heartRate: e.target.value}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="spO2">SpO2 (%)</Label>
+                          <Input id="spO2" type="number" placeholder="98" value={newPatient.vitals.spO2} onChange={e => setNewPatient({...newPatient, vitals: {...newPatient.vitals, spO2: e.target.value}})} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="bloodPressure">Blood Pressure</Label>
+                          <Input id="bloodPressure" placeholder="120/80" value={newPatient.vitals.bloodPressure} onChange={e => setNewPatient({...newPatient, vitals: {...newPatient.vitals, bloodPressure: e.target.value}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="temperature">Temp (°C)</Label>
+                          <Input id="temperature" type="number" step="0.1" placeholder="37.0" value={newPatient.vitals.temperature} onChange={e => setNewPatient({...newPatient, vitals: {...newPatient.vitals, temperature: e.target.value}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="respiratoryRate">Resp Rate</Label>
+                          <Input id="respiratoryRate" type="number" placeholder="16" value={newPatient.vitals.respiratoryRate} onChange={e => setNewPatient({...newPatient, vitals: {...newPatient.vitals, respiratoryRate: e.target.value}})} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -233,7 +270,7 @@ export default function Overview() {
                               <span>Live ECG Feed</span>
                               <span className="text-destructive animate-pulse">● LIVE</span>
                             </div>
-                            <ECGChart patientId={patient.id} height={80} color="rgb(239, 68, 68)" />
+                            {/* <ECGChart patientId={patient.id} height={80} color="rgb(239, 68, 68)" /> */}
                           </div>
                        </CardContent>
                      </Card>

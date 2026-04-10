@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useRoute } from "wouter";
-import { ArrowLeft, User, Phone, Mail, Award, Clock, Users, ShieldCheck } from "lucide-react";
+import { ArrowLeft, User, Phone, Mail, Award, Clock, Users, ShieldCheck, Activity, HeartPulse } from "lucide-react";
 import { MOCK_USERS, MOCK_PATIENTS } from "@/lib/mockData";
 
 export default function DoctorProfile() {

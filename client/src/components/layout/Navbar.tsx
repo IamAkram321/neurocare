@@ -51,13 +51,15 @@ export function Navbar() {
                 Overview
               </Link>
               {(user.role === "admin" || user.role === "doctor") && (
-                <Link href="/dashboard/patients" className={location === "/dashboard/patients" ? "text-primary" : "text-muted-foreground hover:text-primary transition-colors"}>
-                  Patients
-                </Link>
+                <>
+                  <Link href="/dashboard/shift-log" className={location === "/dashboard/shift-log" ? "text-primary" : "text-muted-foreground hover:text-primary transition-colors"}>
+                    Shift Log
+                  </Link>
+                  <Link href={`/dashboard/doctor/${user.role === 'doctor' ? user.id : 'DOC-001'}`} className={location.includes("/dashboard/doctor") ? "text-primary" : "text-muted-foreground hover:text-primary transition-colors"}>
+                    Staff Directory
+                  </Link>
+                </>
               )}
-              <Link href="/dashboard/schedule" className={location === "/dashboard/schedule" ? "text-primary" : "text-muted-foreground hover:text-primary transition-colors"}>
-                Schedule
-              </Link>
             </nav>
           )}
         </div>

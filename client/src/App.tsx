@@ -9,6 +9,8 @@ import LandingPage from "@/pages/landing";
 import LoginPage from "@/pages/auth";
 import Overview from "@/pages/dashboards/Overview";
 import PatientDetail from "@/pages/dashboards/PatientDetail";
+import ShiftLog from "@/pages/dashboards/ShiftLog";
+import DoctorProfile from "@/pages/dashboards/DoctorProfile";
 
 function Router() {
   return (
@@ -20,6 +22,8 @@ function Router() {
       <Route path="/dashboard" component={Overview} />
       <Route path="/dashboard/patients" component={Overview} />
       <Route path="/dashboard/patient/:id" component={PatientDetail} />
+      <Route path="/dashboard/shift-log" component={ShiftLog} />
+      <Route path="/dashboard/doctor/:id" component={DoctorProfile} />
       
       {/* Fallback to Overview for other dashboard sub-routes for now */}
       <Route path="/dashboard/*" component={Overview} />

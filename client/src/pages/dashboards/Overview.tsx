@@ -200,7 +200,9 @@ export default function Overview() {
                 </DialogContent>
               </Dialog>
             )}
-            <Button variant="outline" size="sm" className="hidden sm:flex"><Clock className="mr-2 h-4 w-4" /> Shift Log</Button>
+            <Link href="/dashboard/shift-log">
+              <Button variant="outline" size="sm" className="hidden sm:flex"><Clock className="mr-2 h-4 w-4" /> Shift Log</Button>
+            </Link>
           </div>
         </div>
 

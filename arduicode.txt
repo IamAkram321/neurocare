@@ -1,0 +1,203 @@
+/****************************************************
+ * ICU Patient Monitoring – ESP32 → MERN Backend
+ * Arduino Cloud REMOVED
+ * Data sent via HTTP POST (JSON)
+ ****************************************************/
+
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <LiquidCrystal.h>
+#include <Wire.h>
+#include "MAX30100_PulseOximeter.h"
+#include <math.h>
+
+/* ================== WIFI CONFIG ================== */
+const char* SSID = "projectiot";
+const char* PASS = "projectiot";
+
+/* 🔴 CHANGE THIS TO YOUR BACKEND IP */
+const char* SERVER_URL =
+  "http://10.10.48.6:5000/api/vitals/ingest";
+
+
+/* ================= DEVICE METADATA ================ */
+const char* DEVICE_ID  = "ICU-A - A-01";
+const char* PATIENT_ID = "PAT-001";
+
+/* ================== CONSTANTS ===================== */
+#define REPORTING_PERIOD_MS 1000
+#define THERMISTOR_PIN 34
+#define BUZZER_PIN 14
+
+#define X_PIN 33
+#define Y_PIN 32
+#define Z_PIN 35
+
+const float SERIES_RESISTOR = 10000.0;
+const float B_COEFFICIENT = 3950.0;
+const float NOMINAL_TEMP = 25.0;
+
+/* ================== OBJECTS ======================= */
+PulseOximeter pox;
+LiquidCrystal lcd(2, 15, 19, 18, 5, 4);
+
+/* ================== GLOBALS ======================= */
+uint32_t tsLastReport = 0;
+
+float ambientResistance = 10000.0;
+float humanOffset = 0.0;
+bool calibrated = false;
+bool humanCalibrated = false;
+
+int heartRate = 0;
+int spo2 = 0;
+float temperature = 0.0;
+bool fall = false;
+String status = "";
+
+/* ================= WIFI CONNECT =================== */
+void connectWiFi() {
+  WiFi.begin(SSID, PASS);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi Connected");
+}
+
+/* ================= SEND DATA ====================== */
+void sendVitalsToServer() {
+  if (WiFi.status() != WL_CONNECTED) return;
+
+  HTTPClient http;
+  http.begin(SERVER_URL);
+  http.addHeader("Content-Type", "application/json");
+
+  String payload = "{";
+  payload += "\"deviceId\":\"" + String(DEVICE_ID) + "\",";
+  payload += "\"patientId\":\"" + String(PATIENT_ID) + "\",";
+  payload += "\"temperature\":" + String(temperature, 1) + ",";
+  payload += "\"spo2\":" + String(spo2) + ",";
+  payload += "\"heartRate\":" + String(heartRate) + ",";
+  payload += "\"fall\":" + String(fall ? "true" : "false") + ",";
+  payload += "\"status\":\"" + status + "\"";
+  payload += "}";
+
+  int code = http.POST(payload);
+  Serial.print("HTTP Response: ");
+  Serial.println(code);
+
+  http.end();
+}
+
+/* ================= SETUP ========================== */
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, HIGH);
+
+  lcd.begin(16, 2);
+  lcd.print("ICU Monitoring");
+  lcd.setCursor(0, 1);
+  lcd.print("Initializing...");
+  delay(2000);
+  lcd.clear();
+
+  connectWiFi();
+
+  if (!pox.begin()) {
+    lcd.print("MAX30100 FAIL");
+    while (1);
+  }
+  pox.setIRLedCurrent(MAX30100_LED_CURR_7_6MA);
+
+  /* Ambient Calibration */
+  float adcSum = 0;
+  for (int i = 0; i < 50; i++) {
+    adcSum += analogRead(THERMISTOR_PIN);
+    delay(40);
+  }
+  float avgADC = adcSum / 50.0;
+  float voltage = avgADC * (3.3 / 4095.0);
+  ambientResistance = SERIES_RESISTOR * (voltage / (3.3 - voltage));
+  calibrated = true;
+
+  lcd.print("Touch Sensor");
+  delay(3000);
+  lcd.clear();
+}
+
+/* ================= LOOP =========================== */
+void loop() {
+  pox.update();
+
+  if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
+
+    /* -------- Temperature -------- */
+    int analogValue = analogRead(THERMISTOR_PIN);
+    float voltage = analogValue * (3.3 / 4095.0);
+    float resistance = SERIES_RESISTOR * (voltage / (3.3 - voltage));
+
+    float steinhart = resistance / ambientResistance;
+    steinhart = log(steinhart);
+    steinhart /= B_COEFFICIENT;
+    steinhart += 1.0 / (NOMINAL_TEMP + 273.15);
+    steinhart = 1.0 / steinhart;
+    temperature = steinhart - 273.15;
+
+    if (temperature < 0) temperature = 0;
+
+    static int count = 0;
+    static float sum = 0;
+    if (calibrated && !humanCalibrated && temperature > 30 && temperature < 45) {
+      sum += temperature;
+      count++;
+      if (count >= 30) {
+        humanOffset = (sum / count) - 36.5;
+        humanCalibrated = true;
+      }
+    }
+    if (humanCalibrated) temperature -= humanOffset;
+
+    /* -------- Heart & SpO2 -------- */
+    heartRate = (int)pox.getHeartRate();
+    spo2 = (int)pox.getSpO2();
+
+    /* -------- Fall Detection ------ */
+    int x = analogRead(X_PIN) / 1000;
+    int y = analogRead(Y_PIN) / 1000;
+    int z = analogRead(Z_PIN) / 1000;
+
+    fall = (x == 1 && y == 1 && z == 2);
+    digitalWrite(BUZZER_PIN, fall ? LOW : HIGH);
+
+    /* -------- Status Logic -------- */
+    if (fall) status = "FALL DETECTED";
+    else if (heartRate == 0 || spo2 == 0) status = "KEEP FINGER";
+    else if (heartRate >= 60 && heartRate <= 100 && spo2 >= 95)
+      status = "NORMAL";
+    else status = "ABNORMAL";
+
+    /* -------- LCD Display -------- */
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("HR:");
+    lcd.print(heartRate);
+    lcd.print(" BO:");
+    lcd.print(spo2);
+
+    lcd.setCursor(0, 1);
+    lcd.print("T:");
+    lcd.print(temperature, 1);
+    lcd.print((char)223);
+    lcd.print(" ");
+    lcd.print(status);
+
+    /* -------- SEND DATA -------- */
+    sendVitalsToServer();
+
+    tsLastReport = millis();
+  }
+}

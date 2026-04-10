@@ -1,0 +1,43 @@
+
+> rest-express@1.0.0 dev:client
+> vite dev --port 5000
+
+[1G[0K
+
+[1;1H[0J
+  [32m[1mVITE[22m v7.1.12[39m  [2mready in [0m[1m355[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://172.31.89.194:[1m5000[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[RUNTIME_ERROR]{"type":"runtime-error","timestamp":1775799532499,"name":"Error","message":"Activity is not defined","stack":"    at DoctorProfile /home/runner/workspace/client/src/pages/dashboards/DoctorProfile.tsx:60:87\n\n\n\n\n\n\n\n\n","loc":{"line":60,"column":87,"file":"/home/runner/workspace/client/src/pages/dashboards/DoctorProfile.tsx"},"frame":"58 |                <Card className=\"bg-destructive/5 border-none shadow-sm\">\n59 |                  <CardContent className=\"p-4 flex items-center gap-4\">\n60 |                    <div className=\"p-3 bg-destructive/10 rounded-xl text-destructive\"><Activity className=\"h-5 w-5\" /></div>\n   |                                                                                        ^\n61 |                    <div>\n62 |                      <p className=\"text-sm font-medium text-muted-foreground\">Critical Cases</p>"}
+[RUNTIME_ERROR]{"type":"runtime-error","timestamp":1775799541809,"name":"Error","message":"Activity is not defined","stack":"    at DoctorProfile /home/runner/workspace/client/src/pages/dashboards/DoctorProfile.tsx:60:87\n\n\n\n\n\n\n\n\n","loc":{"line":60,"column":87,"file":"/home/runner/workspace/client/src/pages/dashboards/DoctorProfile.tsx"},"frame":"58 |                <Card className=\"bg-destructive/5 border-none shadow-sm\">\n59 |                  <CardContent className=\"p-4 flex items-center gap-4\">\n60 |                    <div className=\"p-3 bg-destructive/10 rounded-xl text-destructive\"><Activity className=\"h-5 w-5\" /></div>\n   |                                                                                        ^\n61 |                    <div>\n62 |                      <p className=\"text-sm font-medium text-muted-foreground\">Critical Cases</p>"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:40:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/dashboards/DoctorProfile.tsx, /src/index.css[22m

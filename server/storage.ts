@@ -1,4 +1,4 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type User, type InsertUser, type Vital, type InsertVital } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 // modify the interface with any CRUD methods
@@ -8,13 +8,17 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  addVital(vital: InsertVital): Promise<Vital>;
+  getLatestVitals(limit?: number): Promise<Vital[]>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
+  private vitals: Vital[];
 
   constructor() {
     this.users = new Map();
+    this.vitals = [];
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -32,6 +36,23 @@ export class MemStorage implements IStorage {
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
+  }
+
+  async addVital(vital: InsertVital): Promise<Vital> {
+    const newVital: Vital = {
+      id: randomUUID(),
+      heartRate: vital.heartRate?.toString() || null,
+      spo2: vital.spo2?.toString() || null,
+      temperature: vital.temperature?.toString() || null,
+      fall: vital.fall ?? false,
+      timestamp: new Date(),
+    };
+    this.vitals.push(newVital);
+    return newVital;
+  }
+
+  async getLatestVitals(limit: number = 10): Promise<Vital[]> {
+    return this.vitals.slice(-limit).reverse();
   }
 }
 

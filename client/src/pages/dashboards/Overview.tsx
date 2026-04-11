@@ -2,6 +2,7 @@ import { useAuth } from "@/context/AuthContext";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { VitalsCard } from "@/components/dashboard/VitalsCard";
+import { RealTimeVitals } from "@/components/dashboard/RealTimeVitals";
 // import { ECGChart } from "@/components/dashboard/ECGChart";
 import { AlertCircle, Users, Activity, Bed, Clock, Plus, Trash2, UserPlus, HeartPulse, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -247,6 +248,12 @@ export default function Overview() {
               <p className="text-xs text-muted-foreground mt-1">Medical staff on duty</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Real-time Arduino Sensor Data */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold tracking-tight">Live Sensor Data</h3>
+          <RealTimeVitals />
         </div>
 
         {relevantPatients.length > 0 ? (
